@@ -1,6 +1,6 @@
-import {RESULT_CODE, todolistsAPI, TodolistType} from '../../api/todolists-api'
+import {RESULT_CODE, TaskType, todolistsAPI, TodolistType} from '../../api/todolists-api'
 import {RequestStatusType, setAppErrorAC, setAppStatusAC} from "../../app/app-reducer";
-import {handleServerNetworkError} from "../../utils/error-utils";
+import {handleServerAppError, handleServerNetworkError} from "../../utils/error-utils";
 import axios, {AxiosError} from "axios";
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 
@@ -54,6 +54,9 @@ export const addTodolistTC = createAsyncThunk('todolists/addTodolist', async (ti
             if (res.data.resultCode === RESULT_CODE.succeeded) {
                 thunkAPI.dispatch(setAppStatusAC({status: 'succeeded'}))
                 return {todolist: res.data.data.item}
+            } else {
+                handleServerAppError(res.data, thunkAPI.dispatch)
+                return thunkAPI.rejectWithValue({errors: res.data.messages, fieldsErrors: res.data.fieldsErrors})
             }
         } catch (error) {
             const e = error as Error | AxiosError
