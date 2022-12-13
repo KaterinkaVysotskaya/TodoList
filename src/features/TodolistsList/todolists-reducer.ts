@@ -78,6 +78,9 @@ export const changeTodolistTitleTC = createAsyncThunk('todolists/changeTodolistT
             if (res.data.resultCode === RESULT_CODE.succeeded) {
                 thunkAPI.dispatch(setAppStatusAC({status: 'succeeded'}))
                 return {param}
+            } else {   
+                handleServerAppError(res.data, thunkAPI.dispatch)
+                return thunkAPI.rejectWithValue({errors: res.data.messages, fieldsErrors: res.data.fieldsErrors})
             }
         } catch (error) {
             const e = error as Error | AxiosError
